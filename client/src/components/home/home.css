@@ -1,0 +1,438 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f4f4f0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #222;
+}
+
+.home-container {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* HERO */
+
+.hero {
+  background: linear-gradient(
+    135deg,
+    #f4f4f0 0%,
+    #e6efe8 100%
+  );
+
+  padding: 120px 20px;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  display: inline-block;
+  background: #d9e7dc;
+  color: #5c7f63;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 25px;
+}
+
+.hero h1 {
+  font-size: 64px;
+  line-height: 1.1;
+  margin-bottom: 25px;
+  font-weight: 800;
+}
+
+.hero span {
+  color: #5c7f63;
+}
+
+.hero p {
+  max-width: 750px;
+  margin: 0 auto;
+  font-size: 20px;
+  color: #555;
+  line-height: 1.7;
+}
+
+/* BOTÕES */
+
+.buttons {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.primary {
+  background: #5c7f63;
+  color: white;
+  padding: 14px 30px;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.primary:hover {
+  background: #4a6a52;
+  transform: translateY(-3px);
+}
+
+.secondary {
+  background: transparent;
+  border: 2px solid #5c7f63;
+  color: #5c7f63;
+  padding: 14px 30px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.secondary:hover {
+  background: #dfe9e2;
+  transform: translateY(-3px);
+}
+
+/* FUNCIONALIDADES */
+
+.funcionalidades {
+  padding: 100px 20px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.funcionalidades h2 {
+  font-size: 42px;
+  margin-bottom: 50px;
+}
+
+.func-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(280px, 1fr)
+  );
+
+  gap: 25px;
+}
+
+.func-card {
+  background: #f7f7f5;
+  border-radius: 24px;
+  padding: 35px;
+  text-align: left;
+  transition: 0.3s;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.func-card:hover {
+  transform: translateY(-8px);
+  background: #eef4ef;
+}
+
+.func-card h3 {
+  font-size: 24px;
+  margin-bottom: 15px;
+  color: #5c7f63;
+}
+
+.func-card p {
+  color: #666;
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+/* TAG */
+
+.section-tag {
+  display: inline-block;
+  background: #dfe9e2;
+  color: #5c7f63;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* ÁGUA */
+
+.agua-section {
+  padding: 100px 20px;
+  background: linear-gradient(
+    135deg,
+    #dfe9e2 0%,
+    #edf3ee 100%
+  );
+
+  text-align: center;
+}
+
+.agua-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.agua-content h2 {
+  font-size: 46px;
+  margin-bottom: 20px;
+}
+
+.agua-content p {
+  color: #555;
+  font-size: 18px;
+  line-height: 1.7;
+  margin-bottom: 35px;
+}
+
+.agua-calculadora {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.agua-calculadora input {
+  width: 280px;
+  padding: 15px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: white;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+}
+
+.resultado-agua {
+  margin-top: 35px;
+  background: white;
+  padding: 30px;
+  border-radius: 22px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.resultado-agua h3 {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.resultado-agua span {
+  font-size: 42px;
+  color: #5c7f63;
+  font-weight: bold;
+}
+
+/* RECEITAS */
+
+.receitas-home {
+  padding: 100px 20px;
+  text-align: center;
+}
+
+.receitas-home h2 {
+  font-size: 42px;
+  margin-bottom: 50px;
+}
+
+.receitas-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(320px, 1fr)
+  );
+
+  gap: 30px;
+}
+
+.receita-card {
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.receita-card:hover {
+  transform: translateY(-8px);
+}
+
+.receita-img {
+  height: 220px;
+  background: linear-gradient(
+    135deg,
+    #dfe9e2,
+    #c9d8cc
+  );
+}
+
+.receita-info {
+  padding: 30px;
+  text-align: left;
+}
+
+.receita-info h3 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  color: #5c7f63;
+}
+
+.receita-info p {
+  color: #666;
+  line-height: 1.7;
+  margin-bottom: 25px;
+}
+
+/* SOBRE */
+
+.sobre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 50px;
+  flex-wrap: wrap;
+
+  padding: 100px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sobre-texto {
+  flex: 1;
+  min-width: 320px;
+}
+
+.sobre-texto h2 {
+  font-size: 46px;
+  margin-bottom: 25px;
+  line-height: 1.2;
+}
+
+.sobre-texto p {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 18px;
+  line-height: 1.7;
+}
+
+.sobre-img {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.sobre-img img {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 28px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+/* COMO FUNCIONA */
+
+.como {
+  background: linear-gradient(
+    135deg,
+    #dfe9e2 0%,
+    #edf3ee 100%
+  );
+
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.como h2 {
+  font-size: 48px;
+  margin-bottom: 25px;
+}
+
+.como p {
+  max-width: 850px;
+  margin: 0 auto 18px;
+  font-size: 18px;
+  color: #555;
+  line-height: 1.7;
+}
+
+.como .primary {
+  margin-top: 30px;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 900px) {
+
+  .hero h1 {
+    font-size: 48px;
+  }
+
+  .sobre {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .sobre-texto h2,
+  .agua-content h2,
+  .como h2,
+  .receitas-home h2,
+  .funcionalidades h2 {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 600px) {
+
+  .hero {
+    padding: 90px 20px;
+  }
+
+  .hero h1 {
+    font-size: 38px;
+  }
+
+  .hero p {
+    font-size: 17px;
+  }
+
+  .buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .primary,
+  .secondary {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .sobre-texto h2,
+  .agua-content h2,
+  .como h2,
+  .receitas-home h2,
+  .funcionalidades h2 {
+    font-size: 30px;
+  }
+
+  .resultado-agua span {
+    font-size: 32px;
+  }
+}
