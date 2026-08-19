@@ -17,7 +17,7 @@ export default function Navbar() {
         <img 
           src={Logo} 
           alt="Logo" 
-          style={{ width: "40px", marginRight: "10px" }} 
+          style={{ width: "52px", marginRight: "12px" }} 
         />
         <strong>EquilibraPro</strong>
       </NavLink>
