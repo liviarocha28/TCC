@@ -1,64 +1,60 @@
 import React, { useState, useEffect } from "react";
 import "./receitas.css";
 
-const REACT_APP_YOUR_HOSTNAME = 'http://localhost:5051'; // IP do Servidor
+const REACT_APP_YOUR_HOSTNAME = 'http://localhost:5051';
 
 export default function Receitas() {
 
+  const role = localStorage.getItem('role');
+  const isAdmin = role === "admin";
+  const userId = localStorage.getItem('userId');
 
-  const [receitas, setReceitas] = useState([])
+  const [receitas, setReceitas] = useState([]);
+  const [recomendacoes, setRecomendacoes] = useState([]);
+  const [mensagemPerfil, setmensagemPerfil] = useState("");
+  const [abaAtiva, setAbaAtiva] = useState("todas");
+
   useEffect(() => {
-      async function getReceitas() {
-          const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/receitas/`)
-          if (!response.ok) {
-              const message = `An error occurred: ${response.statusText}`
-              window.alert(message)
-              return
-          }
-          const listaReceitas = await response.json()
-          setReceitas(listaReceitas)
+    async function getReceitas() {
+      const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/receitas/`);
+      if (!response.ok) {
+        window.alert(`An error occurred: ${response.statusText}`);
+        return;
       }
-      getReceitas()
-      return
-  }, [receitas.length])
-  const [ingredientesBanco, setIngredientesBanco] = useState([])
+      const listaReceitas = await response.json();
+      setReceitas(listaReceitas);
+    }
+    getReceitas();
+  }, []);
 
+  useEffect(() => {
+    if (!userId) return;
+    async function getRecomendacoes() {
+      const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/recomendacoes/${userId}`);
+      if (!response.ok) return;
+      const data = await response.json();
+      setRecomendacoes(data.receitas || []);
+      if (data.mensagem) setmensagemPerfil(data.mensagem);
+    }
+    getRecomendacoes();
+  }, [userId]);
+
+  const [ingredientesBanco, setIngredientesBanco] = useState([]);
   useEffect(() => {
     async function getIngredientes() {
-        const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/ingredientes/`)
-        if (!response.ok) {
-            const message = `An error occurred: ${response.statusText}`
-            window.alert(message)
-            return
-        }
-        const listaIngredientes = await response.json()
-        setIngredientesBanco(listaIngredientes)
+      const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/ingredientes/`);
+      if (!response.ok) {
+        window.alert(`An error occurred: ${response.statusText}`);
+        return;
+      }
+      const listaIngredientes = await response.json();
+      setIngredientesBanco(listaIngredientes);
     }
-    getIngredientes()
-    return
-  }, [receitas.length])
-     /*   
-  const banco = (() => {
-    try {
-      return JSON.parse(localStorage.getItem("ingredientes")) || [];
-    } catch {
-      return [];
-    }
-  })();
+    getIngredientes();
+  }, []);
 
-  const ingredientesBanco = [...banco].sort((a, b) =>
-    a.nome.localeCompare(b.nome)
-  );
-/*
-  const [receitas, setReceitas] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("receitas")) || [];
-    } catch {
-      return [];
-    }
-  });
-*/
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [receitaExpandida, setReceitaExpandida] = useState(null);
 
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -71,22 +67,27 @@ export default function Receitas() {
   const [editandoIndex, setEditandoIndex] = useState(null);
 
   const tags = [
-    "#vegetariano",
-    "#vegano",
-    "#baixoemcalorias",
-    "#altoemproteina",
-    "#rapido",
-    "#facil",
-    "#semgluten",
-    "#semlactose",
-    "#emagrecimento",
-    "#ganhomassa"
+    "#vegetariano", "#vegano", "#baixoemcalorias", "#altoemproteina",
+    "#rapido", "#facil", "#semgluten", "#semlactose",
+    "#emagrecimento", "#ganhomassa", "#cafe_da_manha", "#lanche",
+    "#almoco", "#jantar", "#sobremesa", "#fibra", "#potassio",
+    "#ferro", "#calcio"
   ];
 
-/*  useEffect(() => {
-    localStorage.setItem("receitas", JSON.stringify(receitas));
-  }, [receitas]);
-*/
+  const [curtidas, setCurtidas] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('curtidas')) || {};
+    } catch { return {}; }
+  });
+
+  const toggleCurtida = (id) => {
+    const novasCurtidas = { ...curtidas };
+    if (novasCurtidas[id]) delete novasCurtidas[id];
+    else novasCurtidas[id] = true;
+    setCurtidas(novasCurtidas);
+    localStorage.setItem('curtidas', JSON.stringify(novasCurtidas));
+  };
+
   const toggleTag = (tag) => {
     if (tagsSelecionadas.includes(tag)) {
       setTagsSelecionadas(tagsSelecionadas.filter((t) => t !== tag));
@@ -98,83 +99,57 @@ export default function Receitas() {
   const uploadFoto = (e) => {
     const arquivo = e.target.files[0];
     if (!arquivo) return;
-
     const reader = new FileReader();
-
-    reader.onloadend = () => {
-      setFoto(reader.result);
-    };
-
+    reader.onloadend = () => setFoto(reader.result);
     reader.readAsDataURL(arquivo);
   };
 
   const adicionarIngrediente = (nomeIng) => {
-
-    const existe = ingredientesSelecionados.find(
-      (i) => i.nome === nomeIng
-    );
-
+    const existe = ingredientesSelecionados.find(i => i.nome === nomeIng);
     if (existe) return;
-
-    const base = ingredientesBanco.find(
-      (i) => i.nome === nomeIng
-    );
-
+    const base = ingredientesBanco.find(i => i.nome === nomeIng);
     if (!base) return;
-
     setIngredientesSelecionados([
       ...ingredientesSelecionados,
       {
         nome: base.nome,
         quantidade: "",
-        medida: base.medida || "100g"
+        medida: "g"
       }
     ]);
-
     setBuscaIngrediente("");
   };
 
   const alterarQtd = (index, valor) => {
-
     const lista = [...ingredientesSelecionados];
-
     lista[index].quantidade = valor;
+    setIngredientesSelecionados(lista);
+  };
 
+  const alterarMedida = (index, valor) => {
+    const lista = [...ingredientesSelecionados];
+    lista[index].medida = valor;
     setIngredientesSelecionados(lista);
   };
 
   const removerIngrediente = (index) => {
-
-    setIngredientesSelecionados(
-      ingredientesSelecionados.filter((_, i) => i !== index)
-    );
+    setIngredientesSelecionados(ingredientesSelecionados.filter((_, i) => i !== index));
   };
 
   const calcular = () => {
-
-    let kcal = 0;
-    let proteinas = 0;
-    let carboidratos = 0;
-    let gorduras = 0;
-    let fibras = 0;
-    let acucares = 0;
-
+    let kcal = 0, proteinas = 0, carboidratos = 0, gorduras = 0, fibras = 0, acucares = 0;
 
     ingredientesSelecionados.forEach((item) => {
-
-      const base = ingredientesBanco.find(
-        (i) => i.nome === item.nome
-      );
-
+      const base = ingredientesBanco.find(i => i.nome === item.nome);
       if (!base) return;
-
       const qtd = Number(item.quantidade);
-
       if (!qtd) return;
 
-      const fator = item.medida === "100g"
-        ? qtd / 100
-        : qtd;
+      let fator = 1;
+      if (item.medida === "g") fator = qtd / 100;
+      else if (item.medida === "kg") fator = qtd * 10;
+      else if (item.medida === "ml") fator = qtd / 100;
+      else fator = qtd;
 
       kcal += Number(base.calorias || 0) * fator;
       proteinas += Number(base.proteinas || 0) * fator;
@@ -195,7 +170,6 @@ export default function Receitas() {
   };
 
   const limparCampos = () => {
-
     setNome("");
     setDescricao("");
     setCategoria("");
@@ -206,8 +180,7 @@ export default function Receitas() {
     setEditandoIndex(null);
   };
 
-async function salvar() {
-
+  async function salvar() {
     if (!nome.trim()) return;
     const totais = calcular();
     const nova = {
@@ -219,132 +192,130 @@ async function salvar() {
       ...totais
     };
 
-    
     if (editandoIndex !== null) {
       const receitaId = receitas[editandoIndex]._id;
       const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/receita/${receitaId}`, {
         method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(nova)
-        })
-        if (!response.ok) {
-            const message = `An error occurred: ${response.statusText}`
-            window.alert(message)
-            return
-        }
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nova)
+      });
+      if (!response.ok) {
+        window.alert(`An error occurred: ${response.statusText}`);
+        return;
+      }
       const lista = [...receitas];
-      lista[editandoIndex] = nova;
+      lista[editandoIndex] = { ...lista[editandoIndex], ...nova };
       setReceitas(lista);
     } else {
-
-    const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/receita/add`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(nova)
-        })
-
-        if (!response.ok) {
-            const message = `An error occurred: ${response.statusText}`
-            window.alert(message)
-            return
-        }
-
-        setReceitas([...receitas, nova]);
+      const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/receita/add`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nova)
+      });
+      if (!response.ok) {
+        window.alert(`An error occurred: ${response.statusText}`);
+        return;
+      }
+      const res = await response.json();
+      setReceitas([...receitas, { ...nova, _id: res.insertedId }]);
     }
     limparCampos();
     setMostrarModal(false);
-  };
-
-
+  }
 
   const editar = (index) => {
-
     const r = receitas[index];
     setNome(r.nome);
     setDescricao(r.descricao);
     setCategoria(r.categoria);
-    setFoto(r.foto);
+    setFoto(r.foto || "");
     setTagsSelecionadas(r.tags || []);
     setIngredientesSelecionados(r.ingredientes || []);
-
     setEditandoIndex(index);
-
     setMostrarModal(true);
   };
 
-  const excluir = (index) => {
-
+  const excluir = async (index) => {
     if (!window.confirm("Deseja excluir esta receita?")) return;
     const receitaId = receitas[index]._id;
-
-    const response = fetch(`${REACT_APP_YOUR_HOSTNAME}/del/${receitaId}`, {
-            method: "DELETE"
-        })
-
+    await fetch(`${REACT_APP_YOUR_HOSTNAME}/del/${receitaId}`, { method: "DELETE" });
     setReceitas(receitas.filter((_, i) => i !== index));
   };
 
   const totais = calcular();
 
-  const sugestoes = ingredientesBanco.filter((item) =>
+  const sugestoes = ingredientesBanco.filter(item =>
     item.nome.toLowerCase().includes(buscaIngrediente.toLowerCase())
   );
 
-  return (
+  const abrirReceita = (item) => setReceitaExpandida(item);
+  const fecharReceita = () => setReceitaExpandida(null);
 
+  const adicionarLista = (nome) => {
+    const lista = JSON.parse(localStorage.getItem('listaCompras')) || [];
+    if (lista.find(i => i.nome === nome)) {
+      alert('Ingrediente ja esta na lista!');
+      return;
+    }
+    lista.push({ nome, comprado: false });
+    localStorage.setItem('listaCompras', JSON.stringify(lista));
+    alert(`${nome} adicionado a lista de compras!`);
+  };
+
+  return (
     <div className="receitas-container">
 
       <div className="topo-receitas">
-
         <div>
           <h1>Receitas</h1>
-          <p>Gerencie receitas saudáveis do EquilibraPro</p>
+          {isAdmin
+            ? <p>Gerencie receitas saudáveis do EquilibraPro</p>
+            : <p>Explore receitas saudáveis do EquilibraPro</p>
+          }
         </div>
-
-        <button
-          className="btn-nova-receita"
-          onClick={() => {
-            limparCampos();
-            setMostrarModal(true);
-          }}
-        >
-          + Nova Receita
-        </button>
-
+        {isAdmin && (
+          <button className="btn-nova-receita" onClick={() => { limparCampos(); setMostrarModal(true); }}>
+            + Nova Receita
+          </button>
+        )}
       </div>
 
+      {!isAdmin && recomendacoes.length > 0 && (
+        <div className="abas-receitas">
+          <button
+            className={abaAtiva === "recomendadas" ? "aba ativa" : "aba"}
+            onClick={() => setAbaAtiva("recomendadas")}
+          >
+            Recomendadas para Voce
+          </button>
+          <button
+            className={abaAtiva === "todas" ? "aba ativa" : "aba"}
+            onClick={() => setAbaAtiva("todas")}
+          >
+            Todas as Receitas
+          </button>
+        </div>
+      )}
+
+      {!isAdmin && mensagemPerfil && abaAtiva === "recomendadas" && (
+        <div className="aviso-perfil">
+          <p>{mensagemPerfil} <a href="/cadastro">Complete aqui.</a></p>
+        </div>
+      )}
+
       <div className="lista-receitas">
-
         <div className="grid-receitas">
+          {(abaAtiva === "recomendadas" && !isAdmin ? recomendacoes : receitas).map((item, index) => (
+            <div className="card-receita" key={item._id || index} onClick={() => isAdmin ? null : abrirReceita(item)}>
 
-          {receitas.map((item, index) => (
-
-            <div className="card-receita" key={index}>
-
-              {item.foto && (
-                <img
-                  src={item.foto}
-                  alt=""
-                  className="foto-card"
-                />
-              )}
+              {item.foto && <img src={item.foto} alt="" className="foto-card" />}
 
               <div className="conteudo-card">
-
                 <h3>{item.nome}</h3>
-
                 <p>{item.descricao}</p>
 
                 <div className="tags-card">
-
-                  {item.tags?.map((tag, i) => (
-                    <span key={i}>{tag}</span>
-                  ))}
-
+                  {item.tags?.map((tag, i) => <span key={i}>{tag}</span>)}
                 </div>
 
                 <div className="infos">
@@ -356,224 +327,164 @@ async function salvar() {
                   <span>{item.acucares}g Açuc</span>
                 </div>
 
-                <div className="acoes">
-
-                  <button
-                    className="btn-editar"
-                    onClick={() => editar(index)}
-                  >
-                    Editar
-                  </button>
-
-                  <button
-                    className="btn-excluir"
-                    onClick={() => excluir(index)}
-                  >
-                    Excluir
-                  </button>
-
+                <div className="acoes" onClick={(e) => e.stopPropagation()}>
+                  {isAdmin ? (
+                    <>
+                      <button className="btn-editar" onClick={() => editar(index)}>Editar</button>
+                      <button className="btn-excluir" onClick={() => excluir(index)}>Excluir</button>
+                    </>
+                  ) : (
+                    <button
+                      className={curtidas[item._id] ? "btn-curtida ativa" : "btn-curtida"}
+                      onClick={() => toggleCurtida(item._id)}
+                    >
+                      {curtidas[item._id] ? "Curtido" : "Curtir"}
+                    </button>
+                  )}
                 </div>
-
               </div>
-
             </div>
-
           ))}
-
         </div>
-
       </div>
 
-      {mostrarModal && (
-
-        <div className="overlay">
-
-          <div className="modal-receita">
+      {/* MODAL EXPANSAO RECEITA (user) */}
+      {receitaExpandida && (
+        <div className="overlay" onClick={fecharReceita}>
+          <div className="modal-expandir" onClick={(e) => e.stopPropagation()}>
 
             <div className="header-modal">
-
-              <h2>
-                {editandoIndex !== null
-                  ? "Editar Receita"
-                  : "Nova Receita"}
-              </h2>
-
-              <button
-                className="btn-fechar"
-                onClick={() => setMostrarModal(false)}
-              >
-                ✕
-              </button>
-
+              <h2>{receitaExpandida.nome}</h2>
+              <button className="btn-fechar" onClick={fecharReceita}>✕</button>
             </div>
 
-            <div className="card-form">
+            {receitaExpandida.foto && (
+              <img src={receitaExpandida.foto} alt="" className="foto-expandir" />
+            )}
 
-              <input
-                placeholder="Nome da receita"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-              />
+            <p className="desc-expandir">{receitaExpandida.descricao}</p>
 
-              <textarea
-                placeholder="Descrição"
-                value={descricao}
-                onChange={(e) => setDescricao(e.target.value)}
-              />
+            <div className="tags-expandir">
+              {receitaExpandida.tags?.map((tag, i) => <span key={i}>{tag}</span>)}
+            </div>
 
-              <label className="upload-box">
+            <div className="infos-expandir">
+              <span>{receitaExpandida.kcal} kcal</span>
+              <span>{receitaExpandida.proteinas}g Proteínas</span>
+              <span>{receitaExpandida.carboidratos}g Carboidratos</span>
+              <span>{receitaExpandida.gorduras}g Gorduras</span>
+              <span>{receitaExpandida.fibras}g Fibras</span>
+              <span>{receitaExpandida.acucares}g Açúcares</span>
+            </div>
 
-                Adicionar Foto
-
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={uploadFoto}
-                />
-
-              </label>
-
-              {foto && (
-                <img
-                  src={foto}
-                  alt=""
-                  className="preview-img"
-                />
-              )}
-
-              <h3>Tags</h3>
-
-              <div className="tags-box">
-
-                {tags.map((tag, index) => (
-
+            <h3>Ingredientes</h3>
+            <div className="lista-ingredientes-expandir">
+              {(receitaExpandida.ingredientes || []).map((ing, i) => (
+                <div className="item-ingrediente-expandir" key={i}>
+                  <span>{ing.nome}</span>
+                  <span className="qtd-ingrediente">{ing.quantidade} {ing.medida}</span>
                   <button
-                    type="button"
-                    key={index}
-                    className={
-                      tagsSelecionadas.includes(tag)
-                        ? "tag ativa"
-                        : "tag"
-                    }
-                    onClick={() => toggleTag(tag)}
+                    className="btn-add-lista"
+                    onClick={() => adicionarLista(ing.nome)}
                   >
-                    {tag}
+                    🛒
                   </button>
-
-                ))}
-
-              </div>
-
-              <h3>Ingredientes</h3>
-
-              <input
-                placeholder="Digite ingrediente..."
-                value={buscaIngrediente}
-                onChange={(e) =>
-                  setBuscaIngrediente(e.target.value)
-                }
-              />
-
-              {buscaIngrediente && sugestoes.length > 0 && (
-
-                <div className="sugestoes">
-
-                  {sugestoes.map((item, index) => (
-
-                    <div
-                      key={index}
-                      className="item-sugestao"
-                      onClick={() =>
-                        adicionarIngrediente(item.nome)
-                      }
-                    >
-                      {item.nome}
-                    </div>
-
-                  ))}
-
                 </div>
-
-              )}
-
-              {ingredientesSelecionados.map((item, index) => (
-
-                <div className="linha-ingrediente" key={index}>
-
-                  <span>{item.nome}</span>
-
-                  <input
-                    type="number"
-                    min="0"
-                    value={item.quantidade}
-                    onChange={(e) =>
-                      alterarQtd(index, e.target.value)
-                    }
-                  />
-
-                  <small>{item.medida}</small>
-
-                  <button
-                    type="button"
-                    className="btn-remover"
-                    onClick={() =>
-                      removerIngrediente(index)
-                    }
-                  >
-                    X
-                  </button>
-
-                </div>
-
               ))}
+            </div>
 
-              <div className="resumo-modal">
-
-                <div className="box-total">
-                  <strong>{totais.kcal}</strong>
-                  <span>kcal</span>
-                </div>
-
-                <div className="box-total">
-                  <strong>{totais.proteinas}</strong>
-                  <span>Proteínas</span>
-                </div>
-
-                <div className="box-total">
-                  <strong>{totais.carboidratos}</strong>
-                  <span>Carboidratos</span>
-                </div>
-                <div className="box-total">
-                  <strong>{totais.gorduras}</strong>
-                  <span>Gorduras</span>
-                </div>
-                <div className="box-total">
-                  <strong>{totais.fibras}</strong>
-                  <span>Fibras</span>
-                </div>
-                <div className="box-total">
-                  <strong>{totais.acucares}</strong>
-                  <span>Açúcares</span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="btn-salvar"
-                onClick={salvar}
-              >
-                {editandoIndex !== null
-                  ? "Atualizar Receita"
-                  : "Salvar Receita"}
-              </button>
-
+            <div className="acoes-expandir">
+              {curtidas[receitaExpandida._id]
+                ? <button className="btn-curtida ativa" onClick={() => toggleCurtida(receitaExpandida._id)}>Curtido</button>
+                : <button className="btn-curtida" onClick={() => toggleCurtida(receitaExpandida._id)}>Curtir</button>
+              }
             </div>
 
           </div>
-
         </div>
+      )}
 
+      {/* MODAL NOVA/EDITAR RECEITA (admin) */}
+      {mostrarModal && (
+        <div className="overlay">
+          <div className="modal-receita">
+
+            <div className="header-modal">
+              <h2>{editandoIndex !== null ? "Editar Receita" : "Nova Receita"}</h2>
+              <button className="btn-fechar" onClick={() => setMostrarModal(false)}>✕</button>
+            </div>
+
+            <div className="card-form">
+              <input placeholder="Nome da receita" value={nome} onChange={(e) => setNome(e.target.value)} />
+              <textarea placeholder="Descrição" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+
+              <label className="upload-box">
+                {foto ? "Trocar Foto" : "Adicionar Foto"}
+                <input type="file" accept="image/*" hidden onChange={uploadFoto} />
+              </label>
+
+              {foto && <img src={foto} alt="" className="preview-img" />}
+
+              <h3>Tags</h3>
+              <div className="tags-box">
+                {tags.map((tag, index) => (
+                  <button type="button" key={index}
+                    className={tagsSelecionadas.includes(tag) ? "tag ativa" : "tag"}
+                    onClick={() => toggleTag(tag)}
+                  >{tag}</button>
+                ))}
+              </div>
+
+              <h3>Ingredientes</h3>
+              <input placeholder="Digite ingrediente..." value={buscaIngrediente} onChange={(e) => setBuscaIngrediente(e.target.value)} />
+
+              {buscaIngrediente && sugestoes.length > 0 && (
+                <div className="sugestoes">
+                  {sugestoes.map((item, index) => (
+                    <div key={index} className="item-sugestao" onClick={() => adicionarIngrediente(item.nome)}>
+                      {item.nome}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {ingredientesSelecionados.map((item, index) => {
+
+                const baseIng = ingredientesBanco.find(i => i.nome === item.nome);
+                const medidasDisponiveis = ["g", "ml", "unidade", "colher de sopa", "colher de chá", "fatia", "copo", "folha"];
+
+                return (
+                  <div className="linha-ingrediente" key={index}>
+                    <span>{item.nome}</span>
+                    <input type="number" min="0" step="any" placeholder="Qtd" value={item.quantidade}
+                      onChange={(e) => alterarQtd(index, e.target.value)} />
+                    <select className="select-medida" value={item.medida}
+                      onChange={(e) => alterarMedida(index, e.target.value)}>
+                      {medidasDisponiveis.map((m, i) => (
+                        <option key={i} value={m}>{m}</option>
+                      ))}
+                    </select>
+                    <button type="button" className="btn-remover" onClick={() => removerIngrediente(index)}>X</button>
+                  </div>
+                );
+              })}
+
+              <div className="resumo-modal">
+                <div className="box-total"><strong>{totais.kcal}</strong><span>kcal</span></div>
+                <div className="box-total"><strong>{totais.proteinas}</strong><span>Proteínas</span></div>
+                <div className="box-total"><strong>{totais.carboidratos}</strong><span>Carboidratos</span></div>
+                <div className="box-total"><strong>{totais.gorduras}</strong><span>Gorduras</span></div>
+                <div className="box-total"><strong>{totais.fibras}</strong><span>Fibras</span></div>
+                <div className="box-total"><strong>{totais.acucares}</strong><span>Açúcares</span></div>
+              </div>
+
+              <button type="button" className="btn-salvar" onClick={salvar}>
+                {editandoIndex !== null ? "Atualizar Receita" : "Salvar Receita"}
+              </button>
+            </div>
+
+          </div>
+        </div>
       )}
 
     </div>

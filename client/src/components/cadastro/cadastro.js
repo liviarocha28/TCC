@@ -2,6 +2,8 @@ import { useState } from "react";
 import "./cadastro.css";
 import { useNavigate } from "react-router-dom";
 
+const REACT_APP_YOUR_HOSTNAME = 'http://localhost:5051';
+
 export default function Cadastro() {
 
   const navigate = useNavigate();
@@ -17,78 +19,65 @@ export default function Cadastro() {
   const [condicoes, setCondicoes] = useState([]);
 
   const handleCheckboxChange = (valor, estado, setEstado) => {
-
     if (estado.includes(valor)) {
-
-      setEstado(
-        estado.filter((item) => item !== valor)
-      );
-
+      setEstado(estado.filter((item) => item !== valor));
     } else {
-
-      setEstado([
-        ...estado,
-        valor
-      ]);
+      setEstado([...estado, valor]);
     }
   };
 
   const calcularIdade = (dataNascimento) => {
-
     const hoje = new Date();
-
     const nascimento = new Date(dataNascimento);
-
-    let idade =
-      hoje.getFullYear() -
-      nascimento.getFullYear();
-
-    const mes =
-      hoje.getMonth() -
-      nascimento.getMonth();
-
-    if (
-      mes < 0 ||
-      (
-        mes === 0 &&
-        hoje.getDate() < nascimento.getDate()
-      )
-    ) {
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const mes = hoje.getMonth() - nascimento.getMonth();
+    if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
       idade--;
     }
-
     return idade;
   };
 
-  const handleSubmit = (e) => {
-
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const idadeCalculada =
-      calcularIdade(dataNascimento);
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      alert("Erro: usuario nao identificado. Faca login novamente.");
+      return;
+    }
+
+    const idadeCalculada = calcularIdade(dataNascimento);
 
     const dados = {
       dataNascimento,
       idade: idadeCalculada,
       genero,
-      peso,
-      altura,
+      peso: Number(peso),
+      altura: Number(altura),
       atividade,
       objetivo,
       restricoes,
       condicoes,
     };
 
-    console.log(
-      "Dados do usuário:",
-      dados
-    );
+    try {
+      const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/user/cadastro/${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      });
 
-    alert(
-      "Cadastro completo realizado!"
-    );
+      if (!response.ok) {
+        alert("Erro ao salvar perfil");
+        return;
+      }
 
-    navigate("/receitas");
+      alert("Cadastro completo realizado!");
+      navigate("/receitas");
+
+    } catch (error) {
+      alert("Erro ao conectar com o servidor");
+    }
   };
 
   return (

@@ -1,0 +1,188 @@
+.lista-container {
+  padding: 32px;
+  background: linear-gradient(180deg, #f8f5f0, #eef3ef);
+  min-height: 100vh;
+  border-radius: 20px;
+}
+
+.lista-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.lista-header h1 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #4f7a65;
+  margin: 0 0 4px;
+}
+
+.lista-header p {
+  color: #888;
+  font-size: 14px;
+  margin: 0;
+}
+
+.btn-limpar {
+  background: #ffe1e1;
+  color: #c0392b;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-limpar:hover {
+  background: #ffd0d0;
+}
+
+/* LISTA VAZIA */
+
+.lista-vazia {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.lista-vazia-icon {
+  font-size: 60px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.lista-vazia p {
+  color: #888;
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+
+.lista-vazia-hint {
+  font-size: 13px !important;
+  color: #aaa !important;
+}
+
+/* ITENS */
+
+.lista-itens {
+  max-width: 500px;
+}
+
+.lista-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  padding: 14px 18px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  border: 1px solid #f0f0f0;
+  transition: 0.2s;
+}
+
+.lista-item:hover {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.lista-item.comprado {
+  opacity: 0.5;
+}
+
+.lista-item.comprado .item-nome {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.check-btn {
+  background: none;
+  border: 2px solid #7fa483;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.check-btn:hover {
+  background: #eef3ef;
+}
+
+.check-icon {
+  font-size: 16px;
+  color: #4f7a65;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.lista-item.comprado .check-btn {
+  background: #4f7a65;
+  border-color: #4f7a65;
+}
+
+.lista-item.comprado .check-icon {
+  color: white;
+}
+
+.item-nome {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.btn-remover-item {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+
+.btn-remover-item:hover {
+  background: #ffe1e1;
+  color: #c0392b;
+}
+
+/* SEPARADOR */
+
+.lista-separador {
+  margin: 18px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.lista-separador span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #999;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 768px) {
+  .lista-container {
+    padding: 18px;
+  }
+
+  .lista-header h1 {
+    font-size: 24px;
+  }
+
+  .lista-itens {
+    max-width: 100%;
+  }
+}

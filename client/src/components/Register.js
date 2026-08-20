@@ -21,7 +21,7 @@ export default function Register() {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ nome, email, senha })
+                body: JSON.stringify({ name: nome, email, senha })
             });
 
             const data = await response.json();
@@ -30,14 +30,14 @@ export default function Register() {
                 return setMensagem(data.message || 'Erro ao registrar');
             }
 
-            setMensagem('Usuário registrado com sucesso!');
+            setMensagem('Usuario registrado com sucesso!');
 
             setNome('');
             setEmail('');
             setSenha('');
 
             setTimeout(() => {
-                navigate("/cadastro");
+                navigate("/login");
             }, 1000);
 
         } catch (error) {

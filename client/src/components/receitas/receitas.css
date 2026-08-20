@@ -2,6 +2,7 @@
   padding: 32px;
   background: linear-gradient(180deg, #f8f5f0, #eef3ef);
   min-height: 100vh;
+  border-radius: 20px;
 }
 
 /* TOPO */
@@ -27,7 +28,7 @@
   font-size: 15px;
 }
 
-/* BOTÃO NOVA RECEITA */
+/* BOTAO NOVA RECEITA */
 
 .btn-nova-receita {
   background: #4f7a65;
@@ -46,42 +47,97 @@
   transform: translateY(-2px);
 }
 
+/* ABAS */
+
+.abas-receitas {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.aba {
+  padding: 10px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+  color: #666;
+}
+
+.aba:hover {
+  border-color: #7fa483;
+  color: #4f7a65;
+}
+
+.aba.ativa {
+  background: #4f7a65;
+  color: white;
+  border-color: #4f7a65;
+}
+
+/* AVISO PERFIL */
+
+.aviso-perfil {
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+.aviso-perfil p {
+  color: #795548;
+  font-size: 14px;
+  margin: 0;
+}
+
+.aviso-perfil a {
+  color: #4f7a65;
+  font-weight: 600;
+}
+
 /* GRID */
 
 .grid-receitas {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
 }
 
 /* CARD RECEITA */
 
 .card-receita {
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 25px rgba(0,0,0,0.05);
   transition: 0.25s;
+  border: 1px solid #f0f0f0;
+  cursor: pointer;
 }
 
 .card-receita:hover {
   transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.1);
 }
 
 .conteudo-card {
-  padding: 22px;
+  padding: 18px;
 }
 
 .card-receita h3 {
   color: #4f7a65;
-  font-size: 22px;
-  margin-bottom: 10px;
+  font-size: 19px;
+  margin-bottom: 8px;
 }
 
 .card-receita p {
   color: #666;
   font-size: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   line-height: 1.5;
 }
 
@@ -98,16 +154,16 @@
 .tags-card {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 12px;
 }
 
 .tags-card span {
   background: #eef3ef;
   color: #4f7a65;
-  padding: 7px 12px;
-  border-radius: 10px;
-  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
   font-weight: 500;
 }
 
@@ -116,34 +172,35 @@
 .infos {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 18px;
+  gap: 6px;
+  margin-bottom: 14px;
 }
 
 .infos span {
   background: #f2efe9;
-  padding: 7px 12px;
-  border-radius: 10px;
+  padding: 5px 10px;
+  border-radius: 8px;
   font-size: 12px;
   color: #555;
 }
 
-/* AÇÕES */
+/* ACOES */
 
 .acoes {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .btn-editar,
 .btn-excluir {
   flex: 1;
   border: none;
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 10px;
+  padding: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
+  font-size: 13px;
 }
 
 .btn-editar {
@@ -164,6 +221,172 @@
   background: #ffd0d0;
 }
 
+.btn-curtida {
+  flex: 1;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  background: #e4f2ea;
+  color: #4f7a65;
+}
+
+.btn-curtida:hover {
+  background: #d6ebe0;
+}
+
+.btn-curtida.ativa {
+  background: #4f7a65;
+  color: white;
+}
+
+.btn-curtida.ativa:hover {
+  background: #3f6552;
+}
+
+/* ======================== */
+/* MODAL EXPANSAO (user)    */
+/* ======================== */
+
+.modal-expandir {
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  animation: aparecer 0.25s ease;
+}
+
+.foto-expandir {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  border-radius: 18px;
+  margin-bottom: 20px;
+}
+
+.desc-expandir {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.tags-expandir {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.tags-expandir span {
+  background: #eef3ef;
+  color: #4f7a65;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.infos-expandir {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.infos-expandir span {
+  background: #f2efe9;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #555;
+  font-weight: 500;
+}
+
+.modal-expandir h3 {
+  color: #4f7a65;
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+
+.lista-ingredientes-expandir {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.item-ingrediente-expandir {
+  display: flex;
+  align-items: center;
+  background: #f8faf8;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  gap: 10px;
+}
+
+.item-ingrediente-expandir span:first-child {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  flex: 1;
+}
+
+.qtd-ingrediente {
+  color: #4f7a65;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.btn-add-lista {
+  background: #4f7a65;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-add-lista:hover {
+  background: #3f6552;
+  transform: scale(1.1);
+}
+
+.acoes-expandir {
+  display: flex;
+}
+
+.acoes-expandir .btn-curtida {
+  font-size: 16px;
+  padding: 14px;
+}
+
+/* ======================== */
+/* MODAL NOVA/EDITAR        */
+/* ======================== */
+
+.modal-receita {
+  width: 100%;
+  max-width: 850px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  animation: aparecer 0.25s ease;
+}
+
 /* OVERLAY */
 
 .overlay {
@@ -178,32 +401,11 @@
   padding: 20px;
 }
 
-/* MODAL */
-
-.modal-receita {
-  width: 100%;
-  max-width: 850px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: white;
-  border-radius: 24px;
-  padding: 30px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-  animation: aparecer 0.25s ease;
-}
-
-/* ANIMAÇÃO */
+/* ANIMACAO */
 
 @keyframes aparecer {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* HEADER MODAL */
@@ -280,13 +482,15 @@
 .upload-box {
   display: block;
   text-align: center;
-  padding: 16px;
+  padding: 20px;
   border-radius: 14px;
   border: 2px dashed #cfd8d3;
   color: #777;
   cursor: pointer;
   margin-bottom: 16px;
   transition: 0.2s;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .upload-box:hover {
@@ -298,13 +502,13 @@
 
 .preview-img {
   width: 100%;
+  max-height: 260px;
   border-radius: 18px;
   margin-bottom: 18px;
   object-fit: cover;
-  max-height: 260px;
 }
 
-/* TAGS */
+/* TAGS FORM */
 
 .tags-box {
   display: flex;
@@ -336,32 +540,48 @@
 
 .linha-ingrediente {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto;
+  grid-template-columns: 2fr 80px 130px auto;
   gap: 10px;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  background: #f8faf8;
+  padding: 10px 14px;
+  border-radius: 12px;
 }
 
 .linha-ingrediente span {
-  font-weight: 500;
+  font-weight: 600;
   color: #333;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.linha-ingrediente input {
-  padding: 10px;
+.linha-ingrediente input,
+.linha-ingrediente .select-medida {
+  padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #e4e4e4;
+  background: #fffdf9;
+  font-size: 13px;
+  outline: none;
+  transition: 0.2s;
+  width: 100%;
 }
 
-.linha-ingrediente small {
-  background: #f2efe9;
-  padding: 8px;
-  border-radius: 10px;
-  text-align: center;
-  color: #666;
+.linha-ingrediente input:focus,
+.linha-ingrediente .select-medida:focus {
+  border-color: #7fa483;
+  box-shadow: 0 0 0 3px rgba(127, 164, 131, 0.15);
 }
 
-/* SUGESTÕES */
+.linha-ingrediente .select-medida {
+  cursor: pointer;
+  appearance: auto;
+}
+
+/* SUGESTOES */
 
 .sugestoes {
   background: white;
@@ -454,8 +674,12 @@
     font-size: 30px;
   }
 
-  .linha-ingrediente {
+  .grid-receitas {
     grid-template-columns: 1fr;
+  }
+
+  .linha-ingrediente {
+    grid-template-columns: 1fr 1fr;
   }
 
   .resumo-modal {
@@ -466,7 +690,12 @@
     flex-direction: column;
   }
 
-  .modal-receita {
+  .modal-receita,
+  .modal-expandir {
     padding: 22px;
+  }
+
+  .foto-expandir {
+    height: 220px;
   }
 }

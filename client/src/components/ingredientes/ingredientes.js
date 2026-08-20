@@ -178,6 +178,19 @@ export default function Ingredientes() {
     "Sementes"
   ];
 
+  const role = localStorage.getItem('role');
+
+  const adicionarLista = (nome) => {
+    const lista = JSON.parse(localStorage.getItem('listaCompras')) || [];
+    if (lista.find(i => i.nome === nome)) {
+      alert('Ingrediente já está na lista!');
+      return;
+    }
+    lista.push({ nome, comprado: false });
+    localStorage.setItem('listaCompras', JSON.stringify(lista));
+    alert(`${nome} adicionado à lista de compras!`);
+  };
+
       const [ingredientes, setIngredientes] = useState([])
   
       useEffect(() => {
@@ -374,9 +387,20 @@ export default function Ingredientes() {
     setMostrarForm(true);
   };
 
-  const excluir = (index) => {
+  const excluir = async (index) => {
 
     if (!window.confirm("Deseja excluir?")) return;
+
+    const item = ingredientes[index];
+
+    try {
+      await fetch(
+        `${REACT_APP_YOUR_HOSTNAME}/ingredientes/${item._id}`,
+        { method: "DELETE" }
+      );
+    } catch (err) {
+      console.error("Erro ao excluir:", err);
+    }
 
     const lista = ingredientes.filter(
       (_, i) => i !== index
@@ -517,8 +541,12 @@ export default function Ingredientes() {
                 "unidade",
                 "kg",
                 "ml",
-                "colher",
-                "xícara"
+                "colher de sopa",
+                "colher de chá",
+                "xícara",
+                "fatia",
+                "copo",
+                "folha"
               ].map((medida, index) => (
 
                 <label key={index}>
@@ -732,23 +760,34 @@ export default function Ingredientes() {
 
                     <div className="card-actions">
 
-                      <button
-                        className="btn-edit"
-                        onClick={() =>
-                          editar(indexOriginal)
-                        }
-                      >
-                        Editar
-                      </button>
+                      {role === "admin" ? (
+                        <>
+                          <button
+                            className="btn-edit"
+                            onClick={() =>
+                              editar(indexOriginal)
+                            }
+                          >
+                            Editar
+                          </button>
 
-                      <button
-                        className="btn-delete"
-                        onClick={() =>
-                          excluir(indexOriginal)
-                        }
-                      >
-                        Excluir
-                      </button>
+                          <button
+                            className="btn-delete"
+                            onClick={() =>
+                              excluir(indexOriginal)
+                            }
+                          >
+                            Excluir
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          className="btn-cart"
+                          onClick={() => adicionarLista(item.nome)}
+                        >
+                          🛒 Adicionar à lista
+                        </button>
+                      )}
 
                     </div>
 

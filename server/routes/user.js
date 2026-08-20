@@ -57,7 +57,8 @@ userRoutes.route('/user/login').post(async function (req, res) {
             mensagem: 'Login bem-sucedido',
             token,
             role: usuario.role,
-            usuario: usuario.name
+            usuario: usuario.name,
+            userId: usuario._id.toString()
         });
 
     } catch (erro) {
@@ -306,6 +307,73 @@ userRoutes.route("/:id").delete(async function (req, res) {
         res.status(204).json({
             message: "It is gone!"
         })
+    }
+})
+
+
+
+// SALVAR PERFIL DO USUÁRIO (CADASTRO)
+
+userRoutes.route("/user/cadastro/:id").post(async function (req, res) {
+
+    const db_connect = dbo.getDb()
+
+    const myquery = {
+        _id: new ObjectId(req.params.id)
+    }
+
+    const newvalues = {
+        $set: {
+            dataNascimento: req.body.dataNascimento,
+            idade: req.body.idade,
+            genero: req.body.genero,
+            peso: req.body.peso,
+            altura: req.body.altura,
+            atividade: req.body.atividade,
+            objetivo: req.body.objetivo,
+            restricoes: req.body.restricoes || [],
+            condicoes: req.body.condicoes || []
+        }
+    }
+
+    try {
+        const result = await db_connect
+            .collection("users")
+            .updateOne(myquery, newvalues)
+
+        console.log("Perfil do usuário atualizado")
+        res.status(200).json(result)
+
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+})
+
+
+
+// BUSCAR USUÁRIO POR ID (inclui dados do perfil)
+
+userRoutes.route("/user/perfil/:id").get(async function (req, res) {
+
+    const db_connect = dbo.getDb()
+
+    const myquery = {
+        _id: new ObjectId(req.params.id)
+    }
+
+    try {
+        const result = await db_connect
+            .collection("users")
+            .findOne(myquery)
+
+        if (!result) {
+            return res.status(404).json({ message: "Usuário não encontrado" })
+        }
+
+        res.status(200).json(result)
+
+    } catch (error) {
+        res.status(500).json({ message: error.message })
     }
 })
 

@@ -2,7 +2,8 @@ import { useState } from 'react';
 import {
     Route,
     Routes,
-    Navigate
+    Navigate,
+    useLocation
 } from "react-router-dom";
 
 import Navbar from "./components/navbar";
@@ -21,6 +22,25 @@ import Receitas from "./components/receitas/receitas";
 import Feed from "./components/feed/feed";
 import Lista from "./components/lista/lista";
 import Ingredientes from "./components/ingredientes/ingredientes";
+import Perfil from "./components/perfil/perfil";
+
+
+
+const ProtectedRoute = ({ children, requireAdmin = false }) => {
+
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (requireAdmin && role !== "admin") {
+        return <Navigate to="/home" replace />;
+    }
+
+    return children;
+};
 
 
 
@@ -31,6 +51,11 @@ const App = () => {
     );
 
     const role = localStorage.getItem('role');
+    const location = useLocation();
+
+    const isAuthPage =
+        location.pathname === '/login' ||
+        location.pathname === '/register';
 
 
 
@@ -38,41 +63,29 @@ const App = () => {
 
         <div className="d-flex flex-column min-vh-100">
 
-            <Navbar />
+            {!isAuthPage && <Navbar />}
 
             <main className="flex-fill container my-4">
 
                 <Routes>
 
                     <Route
-                        path="/"
-                        element={<Home />}
-                    />
-
-                    <Route
-                        path="/home"
-                        element={<Home />}
-                    />
-
-
-                    <Route
                         path="/login"
                         element={
-                            <Login
-                                onLogin={(token) => {
-
-                                    localStorage.setItem(
-                                        'token',
-                                        token
-                                    );
-
-                                    setToken(token);
-
-                                }}
-                            />
+                            token
+                                ? <Navigate to={
+                                    role === "admin"
+                                        ? "/admin"
+                                        : "/home"
+                                  } replace />
+                                : <Login
+                                    onLogin={(tok) => {
+                                        localStorage.setItem('token', tok);
+                                        setToken(tok);
+                                    }}
+                                  />
                         }
                     />
-
 
                     <Route
                         path="/register"
@@ -80,164 +93,138 @@ const App = () => {
                     />
 
                     <Route
-                        path="/cadastro"
-                        element={<Cadastro />}
+                        path="/"
+                        element={
+                            <ProtectedRoute>
+                                <Home />
+                            </ProtectedRoute>
+                        }
                     />
 
-
+                    <Route
+                        path="/home"
+                        element={
+                            <ProtectedRoute>
+                                <Home />
+                            </ProtectedRoute>
+                        }
+                    />
 
                     <Route
                         path="/receitas"
-                        element={<Receitas />}
+                        element={
+                            <ProtectedRoute>
+                                <Receitas />
+                            </ProtectedRoute>
+                        }
                     />
 
                     <Route
                         path="/feed"
-                        element={<Feed />}
+                        element={
+                            <ProtectedRoute>
+                                <Feed />
+                            </ProtectedRoute>
+                        }
                     />
 
                     <Route
                         path="/lista"
-                        element={<Lista />}
+                        element={
+                            <ProtectedRoute>
+                                <Lista />
+                            </ProtectedRoute>
+                        }
                     />
 
-
+                    <Route
+                        path="/perfil"
+                        element={
+                            <ProtectedRoute>
+                                <Perfil />
+                            </ProtectedRoute>
+                        }
+                    />
 
                     <Route
                         path="/ingredientes"
-                        element={<Ingredientes />}
+                        element={
+                            <ProtectedRoute requireAdmin>
+                                <Ingredientes />
+                            </ProtectedRoute>
+                        }
                     />
 
-
+                    <Route
+                        path="/cadastro"
+                        element={
+                            <ProtectedRoute>
+                                <Cadastro />
+                            </ProtectedRoute>
+                        }
+                    />
 
                     <Route
                         path="/users"
                         element={
-                            role === "admin"
-                                ? <UserList />
-                                : <Navigate to="/" replace />
+                            <ProtectedRoute requireAdmin>
+                                <UserList />
+                            </ProtectedRoute>
                         }
                     />
-
-
 
                     <Route
                         path="/edit/:id"
                         element={
-                            role === "admin"
-                                ? <Edit />
-                                : <Navigate to="/" replace />
+                            <ProtectedRoute requireAdmin>
+                                <Edit />
+                            </ProtectedRoute>
                         }
                     />
-
-
 
                     <Route
                         path="/create"
                         element={
-                            role === "admin"
-                                ? <Create />
-                                : <Navigate to="/" replace />
+                            <ProtectedRoute requireAdmin>
+                                <Create />
+                            </ProtectedRoute>
                         }
                     />
 
                     <Route
                         path="/admin"
                         element={
-                            role === "admin"
-                                ? (
-                                    <div>
-
-                                        <h1>
-                                            Painel Administrativo
-                                        </h1>
-
-                                        <p>
-                                            Bem-vinda ao painel do administrador.
-                                        </p>
-
-                                        <div
-                                            style={{
-                                                display: "grid",
-                                                gridTemplateColumns:
-                                                    "repeat(auto-fit, minmax(220px, 1fr))",
-                                                gap: "20px",
-                                                marginTop: "30px"
-                                            }}
-                                        >
-
-                                            <div
-                                                style={{
-                                                    background: "#f4f4f0",
-                                                    padding: "25px",
-                                                    borderRadius: "15px"
-                                                }}
-                                            >
-                                                <h3>
-                                                    Usuários
-                                                </h3>
-
-                                                <p>
-                                                    Gerencie todos os usuários cadastrados.
-                                                </p>
-                                            </div>
-
-                                            <div
-                                                style={{
-                                                    background: "#f4f4f0",
-                                                    padding: "25px",
-                                                    borderRadius: "15px"
-                                                }}
-                                            >
-                                                <h3>
-                                                    Ingredientes
-                                                </h3>
-
-                                                <p>
-                                                    Controle ingredientes e informações nutricionais.
-                                                </p>
-                                            </div>
-
-                                            <div
-                                                style={{
-                                                    background: "#f4f4f0",
-                                                    padding: "25px",
-                                                    borderRadius: "15px"
-                                                }}
-                                            >
-                                                <h3>
-                                                    Receitas
-                                                </h3>
-
-                                                <p>
-                                                    Adicione, edite e exclua receitas.
-                                                </p>
-                                            </div>
-
-                                            <div
-                                                style={{
-                                                    background: "#f4f4f0",
-                                                    padding: "25px",
-                                                    borderRadius: "15px"
-                                                }}
-                                            >
-                                                <h3>
-                                                    Feed
-                                                </h3>
-
-                                                <p>
-                                                    Visualize todas as postagens da comunidade.
-                                                </p>
-                                            </div>
-
+                            <ProtectedRoute requireAdmin>
+                                <div>
+                                    <h1>Painel Administrativo</h1>
+                                    <p>Bem-vinda ao painel do administrador.</p>
+                                    <div style={{
+                                        display: "grid",
+                                        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                                        gap: "20px",
+                                        marginTop: "30px"
+                                    }}>
+                                        <div style={{ background: "#f4f4f0", padding: "25px", borderRadius: "15px" }}>
+                                            <h3>Usuários</h3>
+                                            <p>Gerencie todos os usuários cadastrados.</p>
                                         </div>
-
+                                        <div style={{ background: "#f4f4f0", padding: "25px", borderRadius: "15px" }}>
+                                            <h3>Ingredientes</h3>
+                                            <p>Controle ingredientes e informações nutricionais.</p>
+                                        </div>
+                                        <div style={{ background: "#f4f4f0", padding: "25px", borderRadius: "15px" }}>
+                                            <h3>Receitas</h3>
+                                            <p>Adicione, edite e exclua receitas.</p>
+                                        </div>
+                                        <div style={{ background: "#f4f4f0", padding: "25px", borderRadius: "15px" }}>
+                                            <h3>Feed</h3>
+                                            <p>Visualize todas as postagens da comunidade.</p>
+                                        </div>
                                     </div>
-                                )
-                                : <Navigate to="/" replace />
+                                </div>
+                            </ProtectedRoute>
                         }
                     />
-
 
                     <Route
                         path="*"
@@ -248,7 +235,7 @@ const App = () => {
 
             </main>
 
-            <Footer />
+            {!isAuthPage && <Footer />}
 
         </div>
     );

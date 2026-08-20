@@ -209,6 +209,23 @@
   background: #ffd0d0;
 }
 
+.btn-cart {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+  padding: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 13px;
+  background: #4f7a65;
+  color: white;
+}
+
+.btn-cart:hover {
+  background: #3f6552;
+}
+
 /* MODAL */
 
 .overlay {

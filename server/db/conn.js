@@ -2,10 +2,7 @@ const { MongoClient } = require("mongodb")
 
 const Db = 'mongodb+srv://livia:120501@cluster0.qk4xuno.mongodb.net/?appName=Cluster0'
 
-const client = new MongoClient(Db, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+const client = new MongoClient(Db)
 
 var _db
 

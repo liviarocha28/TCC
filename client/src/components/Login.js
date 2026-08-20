@@ -80,6 +80,15 @@ export default function Login({ onLogin }) {
 
 
 
+            // SALVA USERID
+
+            localStorage.setItem(
+                'userId',
+                data.userId
+            );
+
+
+
             onLogin(data.token);
 
 

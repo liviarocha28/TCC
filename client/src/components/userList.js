@@ -1,93 +1,90 @@
 import React, { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import "./userList.css"
 
-const REACT_APP_YOUR_HOSTNAME = 'http://localhost:5051'; // IP do Servidor
+const REACT_APP_YOUR_HOSTNAME = 'http://localhost:5051';
 
-const Record = (props) => {
+const UserCard = ({ record, deleteRecord }) => {
     return (
-        <tr>
-            <td>{props.record.name}</td>
-            <td>{props.record.user}</td>
-            <td>{props.record.email}</td>
-            <td>{props.record.function}</td>
-            <td>
-                <Link className="btn btn-link" to={`/edit/${props.record._id}`}>Editar</Link> |
-                <button
-                    className="btn btn-link"
-                    onClick={() => {
-                        props.deleteRecord(props.record._id)
-                    }}
-                >
-                    Excluir
-                </button>
-            </td>
-        </tr>
+        <div className="user-card">
+            <div className="user-info">
+                <h4>{record.name}</h4>
+                <p>{record.email}</p>
+                <span className={`user-role ${record.role === 'admin' ? 'admin' : 'user'}`}>
+                    {record.role === 'admin' ? 'Admin' : 'Usuário'}
+                </span>
+            </div>
+            <div className="user-actions">
+                {record.role !== 'admin' && (
+                    <button
+                        className="btn-user-delete"
+                        onClick={() => deleteRecord(record._id)}
+                    >
+                        Excluir
+                    </button>
+                )}
+            </div>
+        </div>
     )
 }
 
 export default function UserList() {
     const [users, setUsers] = useState([])
+    const [busca, setBusca] = useState('')
 
     useEffect(() => {
         async function getUsers() {
             const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/user/`)
-
             if (!response.ok) {
-                const message = `An error occurred: ${response.statusText}`
-                window.alert(message)
+                window.alert(`Erro: ${response.statusText}`)
                 return
             }
-
             const users = await response.json()
             setUsers(users)
         }
-
         getUsers()
-
-        return
-    }, [users.length])
+    }, [])
 
     async function deleteRecord(id) {
-        const result = window.confirm("Will this employee be removed from the list?")
-        if (!result) {
-            return
-        }
+        const result = window.confirm("Deseja excluir este usuário?")
+        if (!result) return
 
         await fetch(`${REACT_APP_YOUR_HOSTNAME}/${id}`, {
             method: "DELETE"
         })
 
-        const newUsers = users.filter((record) => record._id !== id)
-        setUsers(newUsers)
+        setUsers(users.filter((record) => record._id !== id))
     }
 
-    function recordList() {
-        return users.map((record) => {
-            return (
-                <Record
-                    key={record._id}
-                    record={record}
-                    deleteRecord={() => deleteRecord(record._id)}
-                />
-            )
-        })
-    }
+    const filtrados = users.filter((u) =>
+        u.name?.toLowerCase().includes(busca.toLowerCase()) ||
+        u.email?.toLowerCase().includes(busca.toLowerCase())
+    )
 
     return (
-        <div>
-            <h3 className="ps-2">Lista de Usuários</h3>
-            <table className="table table-striped" style={{ marginTop: 20 }}>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Login</th>
-                        <th>E-mail</th>
-                        <th>Função</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>{recordList()}</tbody>
-            </table>
+        <div className="userlist-container">
+            <h2>Usuários Cadastrados</h2>
+            <p className="subtitle">{users.length} usuário(s) no sistema</p>
+
+            <input
+                className="user-search"
+                placeholder="Buscar por nome ou email..."
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+            />
+
+            <div className="user-grid">
+                {filtrados.map((record) => (
+                    <UserCard
+                        key={record._id}
+                        record={record}
+                        deleteRecord={deleteRecord}
+                    />
+                ))}
+            </div>
+
+            {filtrados.length === 0 && (
+                <p className="no-results">Nenhum usuário encontrado.</p>
+            )}
         </div>
     )
 }

@@ -1,0 +1,141 @@
+.userlist-container {
+  padding: 32px;
+  background: linear-gradient(180deg, #f8f5f0, #eef3ef);
+  min-height: 100vh;
+  border-radius: 20px;
+}
+
+.userlist-container h2 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #4f7a65;
+  margin-bottom: 4px;
+}
+
+.userlist-container .subtitle {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.user-search {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 1px solid #e4e4e4;
+  background: #fffdf9;
+  font-size: 14px;
+  color: #4b3f35;
+  outline: none;
+  transition: 0.25s;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+  margin-bottom: 28px;
+}
+
+.user-search:focus {
+  border-color: #7fa483;
+  box-shadow: 0 0 0 4px rgba(127, 164, 131, 0.15);
+}
+
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.user-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+  border: 1px solid #f0f0f0;
+  transition: 0.25s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.07);
+}
+
+.user-info h4 {
+  font-size: 16px;
+  color: #4f7a65;
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+
+.user-info p {
+  font-size: 13px;
+  color: #888;
+  margin: 0 0 10px;
+}
+
+.user-role {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.user-role.admin {
+  background: #4f7a65;
+  color: white;
+}
+
+.user-role.user {
+  background: #eef3ef;
+  color: #4f7a65;
+}
+
+.user-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-user-delete {
+  background: #ffe1e1;
+  color: #c0392b;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-user-delete:hover {
+  background: #ffd0d0;
+}
+
+.no-results {
+  text-align: center;
+  color: #999;
+  margin-top: 40px;
+  font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .user-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .user-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .user-actions {
+    width: 100%;
+  }
+
+  .btn-user-delete {
+    width: 100%;
+  }
+}
