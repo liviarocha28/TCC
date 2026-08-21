@@ -29,6 +29,13 @@ export default function Perfil() {
   const [restricoes, setRestricoes] = useState([]);
   const [condicoes, setCondicoes] = useState([]);
 
+  // Backup para cancelar edições
+  const [backupPessoais, setBackupPessoais] = useState({});
+  const [backupCadastro, setBackupCadastro] = useState({});
+
+  const [editandoPessoais, setEditandoPessoais] = useState(false);
+  const [editandoCadastro, setEditandoCadastro] = useState(false);
+
   const [mensagem, setMensagem] = useState("");
 
   useEffect(() => {
@@ -70,6 +77,38 @@ export default function Perfil() {
     }
   };
 
+  const iniciarEdicaoPessoais = () => {
+    setBackupPessoais({ name, email });
+    setEditandoPessoais(true);
+    setMensagem("");
+  };
+
+  const cancelarEdicaoPessoais = () => {
+    setName(backupPessoais.name);
+    setEmail(backupPessoais.email);
+    setEditandoPessoais(false);
+    setMensagem("");
+  };
+
+  const iniciarEdicaoCadastro = () => {
+    setBackupCadastro({ dataNascimento, genero, peso, altura, atividade, objetivo, restricoes: [...restricoes], condicoes: [...condicoes] });
+    setEditandoCadastro(true);
+    setMensagem("");
+  };
+
+  const cancelarEdicaoCadastro = () => {
+    setDataNascimento(backupCadastro.dataNascimento);
+    setGenero(backupCadastro.genero);
+    setPeso(backupCadastro.peso);
+    setAltura(backupCadastro.altura);
+    setAtividade(backupCadastro.atividade);
+    setObjetivo(backupCadastro.objetivo);
+    setRestricoes(backupCadastro.restricoes);
+    setCondicoes(backupCadastro.condicoes);
+    setEditandoCadastro(false);
+    setMensagem("");
+  };
+
   const salvarPessoais = async () => {
     setMensagem("");
     try {
@@ -85,6 +124,7 @@ export default function Perfil() {
       }
 
       localStorage.setItem('usuario', name);
+      setEditandoPessoais(false);
       setMensagem("Dados pessoais salvos com sucesso!");
     } catch (error) {
       setMensagem("Erro ao conectar com o servidor");
@@ -119,6 +159,7 @@ export default function Perfil() {
         return;
       }
 
+      setEditandoCadastro(false);
       setMensagem("Dados do cadastro salvos com sucesso!");
     } catch (error) {
       setMensagem("Erro ao conectar com o servidor");
@@ -134,6 +175,10 @@ export default function Perfil() {
     if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) idade--;
     return idade;
   };
+
+  const labelGenero = { "Feminino": "Feminino", "Masculino": "Masculino", "Outro": "Outro" };
+  const labelAtividade = { "Sedentário": "Sedentário", "Leve": "Leve", "Moderado": "Moderado", "Intenso": "Intenso" };
+  const labelObjetivo = { "Emagrecimento": "Emagrecimento", "Ganho de massa": "Ganho de massa", "Manutenção": "Manutenção", "Reeducação alimentar": "Reeducação alimentar" };
 
   if (carregando) {
     return (
@@ -179,78 +224,131 @@ export default function Perfil() {
 
       {abaAtiva === "pessoais" && (
         <div className="secao-perfil">
-          <h2>Dados Pessoais</h2>
+          <div className="secao-header">
+            <h2>Dados Pessoais</h2>
+            {!editandoPessoais && (
+              <button className="btn-editar-perfil" onClick={iniciarEdicaoPessoais}>
+                Editar
+              </button>
+            )}
+          </div>
 
           <div className="campo-perfil">
             <label>Nome</label>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+            {editandoPessoais ? (
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+            ) : (
+              <p className="valor-campo">{name || "—"}</p>
+            )}
           </div>
 
           <div className="campo-perfil">
             <label>Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            {editandoPessoais ? (
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            ) : (
+              <p className="valor-campo">{email || "—"}</p>
+            )}
           </div>
 
-          <button className="btn-salvar-perfil" onClick={salvarPessoais}>
-            Salvar Dados Pessoais
-          </button>
+          {editandoPessoais && (
+            <div className="botoes-acao">
+              <button className="btn-salvar-perfil" onClick={salvarPessoais}>
+                Salvar
+              </button>
+              <button className="btn-cancelar-perfil" onClick={cancelarEdicaoPessoais}>
+                Cancelar
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {abaAtiva === "cadastro" && (
         <div className="secao-perfil">
-          <h2>Perfil Nutricional</h2>
+          <div className="secao-header">
+            <h2>Perfil Nutricional</h2>
+            {!editandoCadastro && (
+              <button className="btn-editar-perfil" onClick={iniciarEdicaoCadastro}>
+                Editar
+              </button>
+            )}
+          </div>
 
           <div className="linha-campos">
             <div className="campo-perfil">
               <label>Data de nascimento</label>
-              <input type="date" value={dataNascimento} onChange={(e) => setDataNascimento(e.target.value)} />
+              {editandoCadastro ? (
+                <input type="date" value={dataNascimento} onChange={(e) => setDataNascimento(e.target.value)} />
+              ) : (
+                <p className="valor-campo">{dataNascimento || "—"}</p>
+              )}
             </div>
 
             <div className="campo-perfil">
               <label>Genero</label>
-              <select value={genero} onChange={(e) => setGenero(e.target.value)}>
-                <option value="">Selecione</option>
-                <option>Feminino</option>
-                <option>Masculino</option>
-                <option>Outro</option>
-              </select>
+              {editandoCadastro ? (
+                <select value={genero} onChange={(e) => setGenero(e.target.value)}>
+                  <option value="">Selecione</option>
+                  <option>Feminino</option>
+                  <option>Masculino</option>
+                  <option>Outro</option>
+                </select>
+              ) : (
+                <p className="valor-campo">{genero || "—"}</p>
+              )}
             </div>
           </div>
 
           <div className="linha-campos">
             <div className="campo-perfil">
               <label>Peso (kg)</label>
-              <input type="number" value={peso} onChange={(e) => setPeso(e.target.value)} />
+              {editandoCadastro ? (
+                <input type="number" value={peso} onChange={(e) => setPeso(e.target.value)} />
+              ) : (
+                <p className="valor-campo">{peso ? `${peso} kg` : "—"}</p>
+              )}
             </div>
 
             <div className="campo-perfil">
               <label>Altura (cm)</label>
-              <input type="number" value={altura} onChange={(e) => setAltura(e.target.value)} />
+              {editandoCadastro ? (
+                <input type="number" value={altura} onChange={(e) => setAltura(e.target.value)} />
+              ) : (
+                <p className="valor-campo">{altura ? `${altura} cm` : "—"}</p>
+              )}
             </div>
           </div>
 
           <div className="linha-campos">
             <div className="campo-perfil">
               <label>Nivel de atividade fisica</label>
-              <select value={atividade} onChange={(e) => setAtividade(e.target.value)}>
-                <option value="">Selecione</option>
-                <option>Sedentario</option>
-                <option>Leve</option>
-                <option>Moderado</option>
-                <option>Intenso</option>
-              </select>
+              {editandoCadastro ? (
+                <select value={atividade} onChange={(e) => setAtividade(e.target.value)}>
+                  <option value="">Selecione</option>
+                  <option>Sedentário</option>
+                  <option>Leve</option>
+                  <option>Moderado</option>
+                  <option>Intenso</option>
+                </select>
+              ) : (
+                <p className="valor-campo">{atividade || "—"}</p>
+              )}
             </div>
 
             <div className="campo-perfil">
               <label>Objetivo</label>
-              <select value={objetivo} onChange={(e) => setObjetivo(e.target.value)}>
-                <option value="">Selecione</option>
-                <option>Emagrecimento</option>
-                <option>Ganho de massa</option>
-                <option>Manutencao</option>
-                <option>Reeducacao alimentar</option>
-              </select>
+              {editandoCadastro ? (
+                <select value={objetivo} onChange={(e) => setObjetivo(e.target.value)}>
+                  <option value="">Selecione</option>
+                  <option>Emagrecimento</option>
+                  <option>Ganho de massa</option>
+                  <option>Manutenção</option>
+                  <option>Reeducação alimentar</option>
+                </select>
+              ) : (
+                <p className="valor-campo">{objetivo || "—"}</p>
+              )}
             </div>
           </div>
 
@@ -258,8 +356,8 @@ export default function Perfil() {
             <h3>Restricoes alimentares</h3>
             <div className="checkbox-grid">
               {[
-                "Intolerancia a lactose",
-                "Intolerancia ao glute",
+                "Intolerância à lactose",
+                "Intolerância ao glúten",
                 "Alergia a amendoim",
                 "Vegetariano",
                 "Vegano",
@@ -268,6 +366,7 @@ export default function Perfil() {
                   <input
                     type="checkbox"
                     checked={restricoes.includes(item)}
+                    disabled={!editandoCadastro}
                     onChange={() => handleCheckboxChange(item, restricoes, setRestricoes)}
                   />
                   {item}
@@ -281,13 +380,14 @@ export default function Perfil() {
             <div className="checkbox-grid">
               {[
                 "Diabetes",
-                "Hipertensao",
+                "Hipertensão",
                 "Colesterol alto",
               ].map((item) => (
                 <label className="checkbox-item" key={item}>
                   <input
                     type="checkbox"
                     checked={condicoes.includes(item)}
+                    disabled={!editandoCadastro}
                     onChange={() => handleCheckboxChange(item, condicoes, setCondicoes)}
                   />
                   {item}
@@ -296,9 +396,16 @@ export default function Perfil() {
             </div>
           </div>
 
-          <button className="btn-salvar-perfil" onClick={salvarCadastro}>
-            Salvar Perfil Nutricional
-          </button>
+          {editandoCadastro && (
+            <div className="botoes-acao">
+              <button className="btn-salvar-perfil" onClick={salvarCadastro}>
+                Salvar
+              </button>
+              <button className="btn-cancelar-perfil" onClick={cancelarEdicaoCadastro}>
+                Cancelar
+              </button>
+            </div>
+          )}
         </div>
       )}
 

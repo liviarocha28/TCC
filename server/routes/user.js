@@ -110,7 +110,7 @@ userRoutes.route('/user/register').post(async function (req, res) {
         // DEFINE SE É ADMIN OU USER
 
         const role =
-            email === "SEUEMAIL@gmail.com"
+            email === "livialdarocha@gmail.com"
                 ? "admin"
                 : "user";
 

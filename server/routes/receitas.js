@@ -34,6 +34,27 @@ receitasRoutes.route("/receitas").get(async function (req, res) {
 })
 
 
+receitasRoutes.route("/receitasLimit").get(async function (req, res) {
+
+    const db_connect = dbo.getDb()
+
+    try {
+
+        const result = await db_connect
+            .collection("receitas")
+            .find({})
+            .limit(10)
+            .toArray()
+
+        res.status(200).json(result)
+
+    } catch (error) {
+
+        res.status(404).json({
+            message: error.message
+        })
+    }
+})
 
 // BUSCAR receita POR ID
 

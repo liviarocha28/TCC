@@ -12,17 +12,19 @@ export default function Receitas() {
   const [receitas, setReceitas] = useState([]);
   const [recomendacoes, setRecomendacoes] = useState([]);
   const [mensagemPerfil, setmensagemPerfil] = useState("");
+  const [temPerfil, setTemPerfil] = useState(false);
   const [abaAtiva, setAbaAtiva] = useState("todas");
 
   useEffect(() => {
     async function getReceitas() {
-      const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/receitas/`);
-      if (!response.ok) {
-        window.alert(`An error occurred: ${response.statusText}`);
-        return;
+      try {
+        const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/receitas/`);
+        if (!response.ok) return;
+        const listaReceitas = await response.json();
+        setReceitas(listaReceitas);
+      } catch (e) {
+        console.error("Erro ao buscar receitas:", e);
       }
-      const listaReceitas = await response.json();
-      setReceitas(listaReceitas);
     }
     getReceitas();
   }, []);
@@ -30,11 +32,20 @@ export default function Receitas() {
   useEffect(() => {
     if (!userId) return;
     async function getRecomendacoes() {
-      const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/recomendacoes/${userId}`);
-      if (!response.ok) return;
-      const data = await response.json();
-      setRecomendacoes(data.receitas || []);
-      if (data.mensagem) setmensagemPerfil(data.mensagem);
+      try {
+        const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/recomendacoes/${userId}`);
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data.mensagem) {
+          setmensagemPerfil(data.mensagem);
+          setTemPerfil(false);
+        } else {
+          setTemPerfil(true);
+        }
+        setRecomendacoes(data.receitas || []);
+      } catch (e) {
+        console.error("Erro ao buscar recomendações:", e);
+      }
     }
     getRecomendacoes();
   }, [userId]);
@@ -42,13 +53,14 @@ export default function Receitas() {
   const [ingredientesBanco, setIngredientesBanco] = useState([]);
   useEffect(() => {
     async function getIngredientes() {
-      const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/ingredientes/`);
-      if (!response.ok) {
-        window.alert(`An error occurred: ${response.statusText}`);
-        return;
+      try {
+        const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/ingredientes/`);
+        if (!response.ok) return;
+        const listaIngredientes = await response.json();
+        setIngredientesBanco(listaIngredientes);
+      } catch (e) {
+        console.error("Erro ao buscar ingredientes:", e);
       }
-      const listaIngredientes = await response.json();
-      setIngredientesBanco(listaIngredientes);
     }
     getIngredientes();
   }, []);
@@ -58,7 +70,6 @@ export default function Receitas() {
 
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [categoria, setCategoria] = useState("");
   const [foto, setFoto] = useState("");
   const [buscaIngrediente, setBuscaIngrediente] = useState("");
 
@@ -111,11 +122,7 @@ export default function Receitas() {
     if (!base) return;
     setIngredientesSelecionados([
       ...ingredientesSelecionados,
-      {
-        nome: base.nome,
-        quantidade: "",
-        medida: "g"
-      }
+      { nome: base.nome, quantidade: "", medida: "g" }
     ]);
     setBuscaIngrediente("");
   };
@@ -138,19 +145,16 @@ export default function Receitas() {
 
   const calcular = () => {
     let kcal = 0, proteinas = 0, carboidratos = 0, gorduras = 0, fibras = 0, acucares = 0;
-
     ingredientesSelecionados.forEach((item) => {
       const base = ingredientesBanco.find(i => i.nome === item.nome);
       if (!base) return;
       const qtd = Number(item.quantidade);
       if (!qtd) return;
-
       let fator = 1;
       if (item.medida === "g") fator = qtd / 100;
       else if (item.medida === "kg") fator = qtd * 10;
       else if (item.medida === "ml") fator = qtd / 100;
       else fator = qtd;
-
       kcal += Number(base.calorias || 0) * fator;
       proteinas += Number(base.proteinas || 0) * fator;
       carboidratos += Number(base.carboidratos || 0) * fator;
@@ -158,7 +162,6 @@ export default function Receitas() {
       fibras += Number(base.fibras || 0) * fator;
       acucares += Number(base.acucares || 0) * fator;
     });
-
     return {
       kcal: kcal.toFixed(1),
       proteinas: proteinas.toFixed(1),
@@ -172,7 +175,6 @@ export default function Receitas() {
   const limparCampos = () => {
     setNome("");
     setDescricao("");
-    setCategoria("");
     setFoto("");
     setBuscaIngrediente("");
     setTagsSelecionadas([]);
@@ -184,14 +186,11 @@ export default function Receitas() {
     if (!nome.trim()) return;
     const totais = calcular();
     const nova = {
-      nome,
-      descricao,
-      foto,
+      nome, descricao, foto,
       tags: tagsSelecionadas,
       ingredientes: ingredientesSelecionados,
       ...totais
     };
-
     if (editandoIndex !== null) {
       const receitaId = receitas[editandoIndex]._id;
       const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/receita/${receitaId}`, {
@@ -199,10 +198,7 @@ export default function Receitas() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nova)
       });
-      if (!response.ok) {
-        window.alert(`An error occurred: ${response.statusText}`);
-        return;
-      }
+      if (!response.ok) return;
       const lista = [...receitas];
       lista[editandoIndex] = { ...lista[editandoIndex], ...nova };
       setReceitas(lista);
@@ -212,10 +208,7 @@ export default function Receitas() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nova)
       });
-      if (!response.ok) {
-        window.alert(`An error occurred: ${response.statusText}`);
-        return;
-      }
+      if (!response.ok) return;
       const res = await response.json();
       setReceitas([...receitas, { ...nova, _id: res.insertedId }]);
     }
@@ -227,7 +220,6 @@ export default function Receitas() {
     const r = receitas[index];
     setNome(r.nome);
     setDescricao(r.descricao);
-    setCategoria(r.categoria);
     setFoto(r.foto || "");
     setTagsSelecionadas(r.tags || []);
     setIngredientesSelecionados(r.ingredientes || []);
@@ -262,6 +254,28 @@ export default function Receitas() {
     alert(`${nome} adicionado a lista de compras!`);
   };
 
+  const adicionarTodosLista = () => {
+    if (!receitaExpandida) return;
+    const lista = JSON.parse(localStorage.getItem('listaCompras')) || [];
+    let adicionados = 0;
+    (receitaExpandida.ingredientes || []).forEach((ing) => {
+      if (!lista.find(i => i.nome === ing.nome)) {
+        lista.push({ nome: ing.nome, comprado: false });
+        adicionados++;
+      }
+    });
+    localStorage.setItem('listaCompras', JSON.stringify(lista));
+    if (adicionados > 0) {
+      alert(`${adicionados} ingrediente(s) adicionado(s) a lista de compras!`);
+    } else {
+      alert('Todos os ingredientes ja estao na lista!');
+    }
+  };
+
+  const receitasParaMostrar = isAdmin
+    ? receitas
+    : (abaAtiva === "recomendadas" ? recomendacoes : receitas);
+
   return (
     <div className="receitas-container">
 
@@ -269,8 +283,8 @@ export default function Receitas() {
         <div>
           <h1>Receitas</h1>
           {isAdmin
-            ? <p>Gerencie receitas saudáveis do EquilibraPro</p>
-            : <p>Explore receitas saudáveis do EquilibraPro</p>
+            ? <p>Gerencie receitas saudaveis do EquilibraPro</p>
+            : <p>Explore receitas saudaveis do EquilibraPro</p>
           }
         </div>
         {isAdmin && (
@@ -280,72 +294,78 @@ export default function Receitas() {
         )}
       </div>
 
-      {!isAdmin && recomendacoes.length > 0 && (
+      {!isAdmin && (
         <div className="abas-receitas">
-          <button
-            className={abaAtiva === "recomendadas" ? "aba ativa" : "aba"}
-            onClick={() => setAbaAtiva("recomendadas")}
-          >
-            Recomendadas para Voce
-          </button>
           <button
             className={abaAtiva === "todas" ? "aba ativa" : "aba"}
             onClick={() => setAbaAtiva("todas")}
           >
             Todas as Receitas
           </button>
+          <button
+            className={abaAtiva === "recomendadas" ? "aba ativa" : "aba"}
+            onClick={() => setAbaAtiva("recomendadas")}
+          >
+            Recomendadas para Voce
+          </button>
         </div>
       )}
 
-      {!isAdmin && mensagemPerfil && abaAtiva === "recomendadas" && (
+      {!isAdmin && abaAtiva === "recomendadas" && !temPerfil && (
         <div className="aviso-perfil">
-          <p>{mensagemPerfil} <a href="/cadastro">Complete aqui.</a></p>
+          <p>Voce ainda nao completou seu perfil nutricional. <a href="/cadastro">Complete aqui</a> para receber recomendacoes personalizadas!</p>
         </div>
       )}
 
       <div className="lista-receitas">
-        <div className="grid-receitas">
-          {(abaAtiva === "recomendadas" && !isAdmin ? recomendacoes : receitas).map((item, index) => (
-            <div className="card-receita" key={item._id || index} onClick={() => isAdmin ? null : abrirReceita(item)}>
+        {receitasParaMostrar.length === 0 ? (
+          <div className="aviso-perfil">
+            <p>Nenhuma receita encontrada.</p>
+          </div>
+        ) : (
+          <div className="grid-receitas">
+            {receitasParaMostrar.map((item, index) => (
+              <div className="card-receita" key={item._id || index} onClick={() => isAdmin ? null : abrirReceita(item)}>
 
-              {item.foto && <img src={item.foto} alt="" className="foto-card" />}
+                {item.foto && <img src={item.foto} alt="" className="foto-card" />}
 
-              <div className="conteudo-card">
-                <h3>{item.nome}</h3>
-                <p>{item.descricao}</p>
+                <div className="conteudo-card">
+                  <h3>{item.nome}</h3>
+                  <p>{item.descricao}</p>
 
-                <div className="tags-card">
-                  {item.tags?.map((tag, i) => <span key={i}>{tag}</span>)}
-                </div>
+                  <div className="tags-card">
+                    {item.tags?.map((tag, i) => <span key={i}>{tag}</span>)}
+                  </div>
 
-                <div className="infos">
-                  <span>{item.kcal} kcal</span>
-                  <span>{item.proteinas}g Prot</span>
-                  <span>{item.carboidratos}g Carb</span>
-                  <span>{item.gorduras}g Gord</span>
-                  <span>{item.fibras}g Fibr</span>
-                  <span>{item.acucares}g Açuc</span>
-                </div>
+                  <div className="infos">
+                    <span>{item.kcal} kcal</span>
+                    <span>{item.proteinas}g Prot</span>
+                    <span>{item.carboidratos}g Carb</span>
+                    <span>{item.gorduras}g Gord</span>
+                    <span>{item.fibras}g Fibr</span>
+                    <span>{item.acucares}g Acuc</span>
+                  </div>
 
-                <div className="acoes" onClick={(e) => e.stopPropagation()}>
-                  {isAdmin ? (
-                    <>
-                      <button className="btn-editar" onClick={() => editar(index)}>Editar</button>
-                      <button className="btn-excluir" onClick={() => excluir(index)}>Excluir</button>
-                    </>
-                  ) : (
-                    <button
-                      className={curtidas[item._id] ? "btn-curtida ativa" : "btn-curtida"}
-                      onClick={() => toggleCurtida(item._id)}
-                    >
-                      {curtidas[item._id] ? "Curtido" : "Curtir"}
-                    </button>
-                  )}
+                  <div className="acoes" onClick={(e) => e.stopPropagation()}>
+                    {isAdmin ? (
+                      <>
+                        <button className="btn-editar" onClick={() => editar(index)}>Editar</button>
+                        <button className="btn-excluir" onClick={() => excluir(index)}>Excluir</button>
+                      </>
+                    ) : (
+                      <button
+                        className={curtidas[item._id] ? "btn-curtida ativa" : "btn-curtida"}
+                        onClick={() => toggleCurtida(item._id)}
+                      >
+                        {curtidas[item._id] ? "Curtido" : "Curtir"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* MODAL EXPANSAO RECEITA (user) */}
@@ -370,14 +390,20 @@ export default function Receitas() {
 
             <div className="infos-expandir">
               <span>{receitaExpandida.kcal} kcal</span>
-              <span>{receitaExpandida.proteinas}g Proteínas</span>
+              <span>{receitaExpandida.proteinas}g Proteinas</span>
               <span>{receitaExpandida.carboidratos}g Carboidratos</span>
               <span>{receitaExpandida.gorduras}g Gorduras</span>
               <span>{receitaExpandida.fibras}g Fibras</span>
-              <span>{receitaExpandida.acucares}g Açúcares</span>
+              <span>{receitaExpandida.acucares}g Acucares</span>
             </div>
 
-            <h3>Ingredientes</h3>
+            <div className="header-ingredientes">
+              <h3>Ingredientes</h3>
+              <button className="btn-add-todos-lista" onClick={adicionarTodosLista}>
+                Adicionar todos a lista
+              </button>
+            </div>
+
             <div className="lista-ingredientes-expandir">
               {(receitaExpandida.ingredientes || []).map((ing, i) => (
                 <div className="item-ingrediente-expandir" key={i}>
@@ -416,7 +442,7 @@ export default function Receitas() {
 
             <div className="card-form">
               <input placeholder="Nome da receita" value={nome} onChange={(e) => setNome(e.target.value)} />
-              <textarea placeholder="Descrição" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+              <textarea placeholder="Descricao" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
 
               <label className="upload-box">
                 {foto ? "Trocar Foto" : "Adicionar Foto"}
@@ -449,10 +475,7 @@ export default function Receitas() {
               )}
 
               {ingredientesSelecionados.map((item, index) => {
-
-                const baseIng = ingredientesBanco.find(i => i.nome === item.nome);
-                const medidasDisponiveis = ["g", "ml", "unidade", "colher de sopa", "colher de chá", "fatia", "copo", "folha"];
-
+                const medidasDisponiveis = ["g", "ml", "unidade", "colher de sopa", "colher de cha", "fatia", "copo", "folha"];
                 return (
                   <div className="linha-ingrediente" key={index}>
                     <span>{item.nome}</span>
@@ -471,11 +494,11 @@ export default function Receitas() {
 
               <div className="resumo-modal">
                 <div className="box-total"><strong>{totais.kcal}</strong><span>kcal</span></div>
-                <div className="box-total"><strong>{totais.proteinas}</strong><span>Proteínas</span></div>
+                <div className="box-total"><strong>{totais.proteinas}</strong><span>Proteinas</span></div>
                 <div className="box-total"><strong>{totais.carboidratos}</strong><span>Carboidratos</span></div>
                 <div className="box-total"><strong>{totais.gorduras}</strong><span>Gorduras</span></div>
                 <div className="box-total"><strong>{totais.fibras}</strong><span>Fibras</span></div>
-                <div className="box-total"><strong>{totais.acucares}</strong><span>Açúcares</span></div>
+                <div className="box-total"><strong>{totais.acucares}</strong><span>Acucares</span></div>
               </div>
 
               <button type="button" className="btn-salvar" onClick={salvar}>
