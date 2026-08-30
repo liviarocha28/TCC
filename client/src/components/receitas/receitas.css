@@ -99,6 +99,61 @@
   font-weight: 600;
 }
 
+/* BUSCA E CATEGORIAS */
+
+.busca-categorias {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.barra-busca input {
+  width: 100%;
+  padding: 15px 18px;
+  border-radius: 14px;
+  border: 2px solid #e0e0e0;
+  background: #fffdf9;
+  font-size: 15px;
+  transition: 0.2s;
+  color: #333;
+}
+
+.barra-busca input:focus {
+  border-color: #7fa483;
+  box-shadow: 0 0 0 3px rgba(127, 164, 131, 0.15);
+  outline: none;
+}
+
+.filtros-categoria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filtros-categoria .cat {
+  padding: 10px 18px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+  color: #666;
+}
+
+.filtros-categoria .cat:hover {
+  border-color: #7fa483;
+  color: #4f7a65;
+}
+
+.filtros-categoria .cat.ativa {
+  background: #4f7a65;
+  color: white;
+  border-color: #4f7a65;
+}
+
 /* GRID */
 
 .grid-receitas {

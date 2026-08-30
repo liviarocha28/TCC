@@ -1,8 +1,11 @@
 const { MongoClient } = require("mongodb")
 
-const Db = 'mongodb+srv://livia:120501@cluster0.qk4xuno.mongodb.net/?appName=Cluster0'
+const Db = process.env.MONGODB_URI || 'mongodb+srv://livia:120501@cluster0.qk4xuno.mongodb.net/?appName=Cluster0&tls=true'
 
-const client = new MongoClient(Db)
+const client = new MongoClient(Db, {
+    serverSelectionTimeoutMS: 30000,
+    tls: true,
+})
 
 var _db
 

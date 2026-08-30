@@ -3,6 +3,20 @@ import "./receitas.css";
 
 const REACT_APP_YOUR_HOSTNAME = 'http://localhost:5051';
 
+const fotoUrl = (caminho) => {
+  if (!caminho) return "";
+  if (caminho.startsWith("data:image")) return caminho;
+  if (caminho.startsWith("http")) return caminho;
+  return `${REACT_APP_YOUR_HOSTNAME}${caminho}`;
+};
+
+const categorias = [
+  { nome: "Café da Manhã", tag: "#cafe_da_manha" },
+  { nome: "Almoço", tag: "#almoco" },
+  { nome: "Jantar", tag: "#jantar" },
+  { nome: "Lanche", tag: "#lanche" },
+];
+
 export default function Receitas() {
 
   const role = localStorage.getItem('role');
@@ -14,6 +28,8 @@ export default function Receitas() {
   const [mensagemPerfil, setmensagemPerfil] = useState("");
   const [temPerfil, setTemPerfil] = useState(false);
   const [abaAtiva, setAbaAtiva] = useState("todas");
+  const [buscaTexto, setBuscaTexto] = useState("");
+  const [categoriaAtiva, setCategoriaAtiva] = useState("todas");
 
   useEffect(() => {
     async function getReceitas() {
@@ -107,12 +123,22 @@ export default function Receitas() {
     }
   };
 
-  const uploadFoto = (e) => {
+  const uploadFoto = async (e) => {
     const arquivo = e.target.files[0];
     if (!arquivo) return;
-    const reader = new FileReader();
-    reader.onloadend = () => setFoto(reader.result);
-    reader.readAsDataURL(arquivo);
+    const formData = new FormData();
+    formData.append("file", arquivo);
+    try {
+      const response = await fetch(`${REACT_APP_YOUR_HOSTNAME}/upload`, {
+        method: "POST",
+        body: formData
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      setFoto(data.caminho);
+    } catch (err) {
+      console.error("Erro no upload:", err);
+    }
   };
 
   const adicionarIngrediente = (nomeIng) => {
@@ -276,6 +302,27 @@ export default function Receitas() {
     ? receitas
     : (abaAtiva === "recomendadas" ? recomendacoes : receitas);
 
+  const filtrar = (lista) => {
+    let result = lista;
+    if (buscaTexto.trim()) {
+      const busca = buscaTexto.trim().toLowerCase();
+      result = result.filter((r) =>
+        (r.nome || "").toLowerCase().includes(busca) ||
+        (r.descricao || "").toLowerCase().includes(busca) ||
+        (r.tags || []).some((t) => t.toLowerCase().includes(busca))
+      );
+    }
+    if (categoriaAtiva !== "todas") {
+      const cat = categorias.find((c) => c.nome === categoriaAtiva);
+      if (cat) {
+        result = result.filter((r) => (r.tags || []).includes(cat.tag));
+      }
+    }
+    return result;
+  };
+
+  const receitasParaMostrar2 = filtrar(receitasParaMostrar);
+
   return (
     <div className="receitas-container">
 
@@ -317,17 +364,45 @@ export default function Receitas() {
         </div>
       )}
 
+      <div className="busca-categorias">
+        <div className="barra-busca">
+          <input
+            type="text"
+            placeholder="Buscar receitas por nome, descrição ou tag..."
+            value={buscaTexto}
+            onChange={(e) => setBuscaTexto(e.target.value)}
+          />
+        </div>
+        <div className="filtros-categoria">
+          <button
+            className={categoriaAtiva === "todas" ? "cat ativa" : "cat"}
+            onClick={() => setCategoriaAtiva("todas")}
+          >
+            Todas
+          </button>
+          {categorias.map((c) => (
+            <button
+              key={c.nome}
+              className={categoriaAtiva === c.nome ? "cat ativa" : "cat"}
+              onClick={() => setCategoriaAtiva(c.nome)}
+            >
+              {c.nome}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="lista-receitas">
-        {receitasParaMostrar.length === 0 ? (
+        {receitasParaMostrar2.length === 0 ? (
           <div className="aviso-perfil">
             <p>Nenhuma receita encontrada.</p>
           </div>
         ) : (
           <div className="grid-receitas">
-            {receitasParaMostrar.map((item, index) => (
+            {receitasParaMostrar2.map((item, index) => (
               <div className="card-receita" key={item._id || index} onClick={() => isAdmin ? null : abrirReceita(item)}>
 
-                {item.foto && <img src={item.foto} alt="" className="foto-card" />}
+                {item.foto && <img src={fotoUrl(item.foto)} alt="" className="foto-card" />}
 
                 <div className="conteudo-card">
                   <h3>{item.nome}</h3>
@@ -379,7 +454,7 @@ export default function Receitas() {
             </div>
 
             {receitaExpandida.foto && (
-              <img src={receitaExpandida.foto} alt="" className="foto-expandir" />
+              <img src={fotoUrl(receitaExpandida.foto)} alt="" className="foto-expandir" />
             )}
 
             <p className="desc-expandir">{receitaExpandida.descricao}</p>
@@ -449,7 +524,7 @@ export default function Receitas() {
                 <input type="file" accept="image/*" hidden onChange={uploadFoto} />
               </label>
 
-              {foto && <img src={foto} alt="" className="preview-img" />}
+              {foto && <img src={fotoUrl(foto)} alt="" className="preview-img" />}
 
               <h3>Tags</h3>
               <div className="tags-box">

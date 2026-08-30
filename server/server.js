@@ -1,11 +1,13 @@
 const express = require("express")
 const app = express()
 const cors = require("cors")
+const path = require("path")
 
 const port = 5051
 
 app.use(cors())
 app.use(express.json({ limit: '50mb' }))
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 app.use(require("./routes/user")) // cria as rotas para manipulação de usuários
 app.use(require("./routes/ingredientes")) // cria as rotas para manipulação de ingredientes
 app.use(require("./routes/receitas")) // cria as rotas para manipulação de receitas

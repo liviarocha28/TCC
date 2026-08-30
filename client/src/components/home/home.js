@@ -193,6 +193,52 @@ export default function Home() {
 
       </section>
 
+      <section className="exercicios-section">
+
+        <div className="exercicios-content">
+
+          <span className="section-tag">
+            Saúde completa
+          </span>
+
+          <h2>
+            Lembre-se: movimentar o corpo é essencial
+          </h2>
+
+          <p>
+            Alimentação saudável e atividade física andam
+            juntas. A prática regular de exercícios ajuda a
+            controlar o peso, fortalecer o coração, melhorar
+            o humor e aumentar a disposição no dia a dia.
+          </p>
+
+          <p>
+            Separe pelo menos 30 minutos por dia para se
+            movimentar: caminhe, pedale, dance ou pratique
+            a atividade que você mais gosta. Pequenos
+            hábitos, quando somados a uma boa alimentação,
+            transformam a sua saúde.
+          </p>
+
+          <div className="exercicios-dicas">
+            <div className="dica">
+              <strong>💪 Força</strong>
+              <span>Faça alongamentos ou exercícios de força 2 a 3 vezes por semana.</span>
+            </div>
+            <div className="dica">
+              <strong>🚶 Movimento</strong>
+              <span>Substitua o carro por uma caminhada sempre que possível.</span>
+            </div>
+            <div className="dica">
+              <strong>💧 Hidrate-se</strong>
+              <span>Beba água antes, durante e depois dos exercícios.</span>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
       <section className="receitas-home">
 
         <span className="section-tag">

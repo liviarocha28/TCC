@@ -436,3 +436,66 @@ body {
     font-size: 32px;
   }
 }
+/* EXERCICIOS */
+
+.exercicios-section {
+  background: linear-gradient(135deg, #e8f1ec, #eef5f0);
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.exercicios-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.exercicios-content h2 {
+  font-size: 38px;
+  color: #4f7a65;
+  margin-bottom: 18px;
+}
+
+.exercicios-content p {
+  font-size: 17px;
+  line-height: 1.7;
+  color: #555;
+  max-width: 720px;
+  margin: 0 auto 14px;
+}
+
+.exercicios-dicas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 35px;
+}
+
+.exercicios-dicas .dica {
+  background: white;
+  border-radius: 18px;
+  padding: 26px 22px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+  text-align: left;
+}
+
+.exercicios-dicas .dica strong {
+  display: block;
+  font-size: 20px;
+  color: #4f7a65;
+  margin-bottom: 10px;
+}
+
+.exercicios-dicas .dica span {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .exercicios-dicas {
+    grid-template-columns: 1fr;
+  }
+  .exercicios-content h2 {
+    font-size: 30px;
+  }
+}
